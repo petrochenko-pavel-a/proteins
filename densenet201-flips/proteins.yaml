@@ -1,0 +1,39 @@
+architecture: DenseNet201
+pooling: avg
+augmentation:
+ Fliplr: 0.5
+ Flipud: 0.5
+ Affine:
+   rotate: [-30,30]
+   translate_percent:
+     x: [-0.1,0.1]
+     y: [-0.1,0.1]
+classes: 28
+activation: sigmoid
+weights: imagenet
+shape: [512, 512, 4]
+optimizer: Adam
+batch: 4
+lr: 0.0001
+metrics:
+  - binary_accuracy
+  - macro_f1
+primary_metric: val_binary_accuracy
+callbacks:
+  EarlyStopping:
+    patience: 15
+    monitor: val_binary_accuracy
+    verbose: 1
+  ReduceLROnPlateau:
+    patience: 4
+    factor: 0.5
+    monitor: val_binary_accuracy
+    mode: auto
+    cooldown: 5
+    verbose: 1
+loss: binary_crossentropy
+stages:
+  - epochs: 30
+    negatives: real
+  - epochs: 30
+    negatives: real
