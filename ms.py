@@ -1,11 +1,72 @@
 import sklearn.model_selection as ms
+import pandas as pd
 import numpy as np
-X = np.array([[1, 2], [3, 4], [1, 2], [3, 4], [1, 2], [3, 4]])
-y = np.array([[1, 2], [3, 4], [1, 2], [3, 4], [1, 2], [3, 4]])
-v=ms.StratifiedShuffleSplit(n_splits=5,test_size=0.4,random_state=0)
+import os
 
-for train_index, test_index in v.split(X, y):
-    print("TRAIN:", train_index, "TEST:", test_index)
-    X_train, X_test = X[train_index], X[test_index]
-    y_train, y_test = y[train_index], y[test_index]
-    print("A")
+DIR="D:/cells/";
+
+def getTrainDataset():
+    path_to_train = DIR + '/train/'
+    data = pd.read_csv(DIR + '/train.csv')
+    paths = []
+    labels = []
+    for name, lbl in zip(data['Id'], data['Target'].str.split(' ')):
+        y = np.zeros(28)
+        for key in lbl:
+            y[int(key)] = 1
+        paths.append(os.path.join(path_to_train, name))
+        labels.append(y)
+    return np.array(paths), np.array(labels)
+
+
+
+# import numpy as np
+# X = np.array([[1, 2], [3, 4], [1, 2], [3, 4], [1, 2], [3, 4]])
+# y = np.array([[1, 2], [0, 1,2], [1, 2], [0, 3], [0, 3], [3, 1]])
+X,y= getTrainDataset();
+
+all=np.arange(y.shape[0])
+
+
+currentSet=set(all)
+
+rs=[]
+for c in range(y.shape[1]):
+    goodClasss=np.where(y[:,c]>0)[0]
+    rs.append(len(goodClasss))
+    print(len(goodClasss),c)
+    len(goodClasss)
+zz=np.argsort(np.array(rs))
+
+trainSet=set()
+testSet=set()
+
+np.random.seed(12)
+for v in zz:
+    # now we should start choosing examples
+    goodClasss = np.where(y[:, v] > 0)[0]
+    np.random.shuffle(goodClasss)
+    test=0
+    train=0
+    for c in goodClasss:
+
+        if test*5<train:
+            if not c in trainSet:
+                testSet.add(c)
+                test=test+1
+            else:
+                train=train+1
+                trainSet.add(c);
+        else:
+            if not c in testSet:
+                train = train + 1
+                trainSet.add(c);
+            else:
+                testSet.add(c)
+                test = test + 1
+    print(test,train)
+    # vv=goodClasss
+    # vv1=vv[:vv.shape[0]//5]
+    # vv2=vv[vv.shape[0]//5:]
+tt=y[np.array(list(trainSet)),:]
+print(tt)
