@@ -1,0 +1,36 @@
+architecture: NASNetLarge
+pooling: avg
+augmentation:
+ Fliplr: 0.5
+ Flipud: 0.5
+ Rotate90: true
+classes: 28
+activation: sigmoid
+weights: imagenet
+shape: [256, 256, 4]
+optimizer: Adam
+batch: 6
+lr: 0.0002
+copyWeights: true
+extra_train_data: train2
+metrics:
+  - binary_accuracy
+  - macro_f1
+primary_metric: val_macro_f1
+primary_metric_mode: max
+callbacks:
+  EarlyStopping:
+    patience: 15
+    monitor: val_macro_f1
+    mode: max
+    verbose: 1
+  ReduceLROnPlateau:
+    patience: 4
+    factor: 0.3
+    monitor: val_binary_accuracy
+    mode: max
+    cooldown: 1
+    verbose: 1
+loss: binary_crossentropy
+stages:
+  - epochs: 150

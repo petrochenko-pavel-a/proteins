@@ -1,0 +1,38 @@
+architecture: Xception
+pooling: avg
+augmentation:
+ Fliplr: 0.5
+ Flipud: 0.5
+ Rotate90: true
+classes: 28
+activation: sigmoid
+weights: imagenet
+extra_train_data: train2
+shape: [512, 512, 4]
+optimizer: Adam
+batch: 10
+lr: 0.0001
+copyWeights: true
+metrics:
+  - binary_accuracy
+  - macro_f1
+primary_metric: val_macro_f1
+primary_metric_mode: max
+
+callbacks:
+  EarlyStopping:
+    patience: 15
+    monitor: val_macro_f1
+    mode: max
+    verbose: 1
+  CyclicLR:
+    base_lr: 0.00001
+    max_lr: 0.0005
+    mode: triangular2
+    step_size: 32432
+loss: binary_crossentropy
+stages:
+  - epochs: 150
+    loss: binary_crossentropy
+  #- epochs: 150
+  #  loss: focal_loss

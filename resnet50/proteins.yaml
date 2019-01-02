@@ -1,0 +1,44 @@
+architecture: Xception
+pooling: avg
+augmentation:
+ Fliplr: 0.5
+ Flipud: 0.5
+classes: 28
+activation: sigmoid
+weights: imagenet
+shape: [256, 256, 4]
+optimizer: Adam
+batch: 8
+lr: 0.0005
+copyWeights: true
+metrics:
+  - binary_accuracy
+  - macro_f1
+primary_metric: val_macro_f1
+primary_metric_mode: max
+callbacks:
+  EarlyStopping:
+    patience: 15
+    monitor: val_macro_f1
+    mode: max
+    verbose: 1
+  ReduceLROnPlateau:
+    patience: 12
+    factor: 0.3
+    monitor: val_macro_f1
+    mode: max
+    cooldown: 2
+    verbose: 1
+#  CyclicLR:
+#      base_lr: 0.00001
+#      max_lr: 0.0005
+#      mode: triangular2
+#      step_size: 2000
+loss: f1_loss
+clipnorm: 1.0
+#dropout: 0.5
+stages:
+  - epochs: 100
+  - epochs: 100
+    loss: 5*f1_loss+0.3*focal_loss
+    lr: 0.00001
