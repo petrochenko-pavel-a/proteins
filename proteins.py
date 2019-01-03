@@ -146,47 +146,30 @@ def main():
 
    cfg=classification.parse("./xc2/proteins.yaml")
    cfg0=classification.parse("./xception-clr/proteins.yaml")
+   cfg2 = classification.parse("./nas-net/proteins.yaml")
    classification.extra_train["train2"]=tg2
    # finder=cfg.lr_find(tg,stage=2,epochs=1)
    # finder.plot_loss(n_skip_beginning=20, n_skip_end=5)
    # plt.show()
    # finder.plot_loss_change(sma=20, n_skip_beginning=20, n_skip_end=5, y_lim=(-0.01, 0.01))
    # plt.show()
-   #exit(0)
+
    #cfg0=classification.parse("C:/Users/Павел/PycharmProjects/classification_training_pipeline/examples/proteins2/proteins.yaml")
    cfg.gpus=2
    cfg.setAllowResume(True)
    #ds.USE_MULTIPROCESSING=True
-   cfg.fit(tg,foldsToExecute=[0],start_from_stage=0)
-   #lastFullValPred ,lastFullValLabels =load("./store/0xc256.eval_dat")
-   #lastFullValPred1, lastFullValLabels1 = load("./store/0nn256.eval_dat")
-   #TP1,FOLD_0_MIX_TRESH,m=getOptimalT2(lastFullValPred,lastFullValPred1,lastFullValLabels)
-   #save("./store/mix00.eval",(TP1,FOLD_0_MIX_TRESH))
+   cfg.fit(tg,foldsToExecute=[2],start_from_stage=0)
 
-   #FOLD_0_MIX_TRESH, TP1 =load("./store/mix00.eval")
-   #exit(0)
 
-   #lastFullValPred, lastFullValLabels = cfg.evaluate_all_to_arrays(tg,1,0,ttflips=True)
+   #lastFullValPred, lastFullValLabels = cfg.evaluate_all_to_arrays(tg,0,0,ttflips=True)
+   #TPX, mn = getOptimalT(lastFullValPred+lastFullValPred1+lastFullValPred2,lastFullValLabels)
 
-   #save("./store/0xc256.eval_dat",(lastFullValPred ,lastFullValLabels))
-   #exit(0)
-   #lastFullValPred1, lastFullValLabels1 = cfg0.evaluate_all_to_arrays(tg, 1, 0, ttflips=True)
-   # lastFullValPred2, lastFullValLabels2 = cfg.evaluate_all_to_arrays(tg, 0, 0, ttflips=True)
 
-   # lastFullValPred=(lastFullValPred2*0.5+lastFullValPred1*0.5)/2
-
-   v,l=load("./store/0nn256.eval_dat")
-   v1,l=load("./store/0xc256.eval_dat")
-   #v1=lastFullValPred1
-   v2,l=load("./store/1xcf256.eval_dat")
-   FOLD_1_MIX_TRESH=load("BB")
-   #save("BB",FOLD_1_1_TRESH)
-
-   #TP1, mn = getOptimalT(lastFullValPred2,lastFullValLabels2)
+   #save("BA",TPX)
 
    #FOLD_1_TRESH, mn = getOptimalT(v2,l)
-
-   FOLD_0_MIX_TRESH=load("AA")
+   FOLD_1_MIX_TRESH = load("BB")
+   FOLD_0_MIX_TRESH=load("BA")
    FOLD_1_TRESH=load("AB")
    FOLD_2_TRESH = load("AC")
    FOLD_3_TRESH= load("AD")
@@ -198,26 +181,23 @@ def main():
 
    submit = pd.read_csv(DIR + '/sample_submission.csv')
    prediction = []
-   vd = cfg.validation(tg,0)
-   #P5=cfg.predict_all_to_array(testg, 1, 0, ttflips=True,batch_size=64)
-   P5=load("./store/1cx256.pred_dat")
-   #FOLD_1 = cfg.predict_all_to_array(testg, 1, 0, ttflips=True, batch_size=64)
-   FOLD_4=load("./store/4xc256.pred_dat")
 
+   #P5=cfg.predict_all_to_array(testg, 0, 0, ttflips=True,batch_size=64)
+
+
+   FOLD_4=load("./store/4xc256.pred_dat")
+   FOLD_0_2=load("./store/0cx512.pred_dat")
    FOLD_0_0=load("./store/0nn256.pred_dat")
    FOLD_0_1 = load("./store/0xc256.pred_dat")
    FOLD_2 = load("./store/2xc256.pred_dat")
    FOLD_1 =load("./store/1xc256.pred_dat")
-   FOLD_0_JOINT=(FOLD_0_0+FOLD_0_1)/2
-   #FOLD_1=(FOLD_1+(FOLD_0_0+FOLD_0_1)/2)/3
 
-   #print(FOLD_1)
+   FOLD_0_JOINT=(FOLD_0_0+FOLD_0_1+FOLD_0_2)
+
    FOLD_1_1 = load("./store/1xc512.pred_dat")
+   FOLD_1_JOINT=FOLD_1+FOLD_1_1;
+
    FOLD_3=load("./store/3xc256.pred_dat")
-   #FOLD_1=(FOLD_1*0.5+FOLD_3*0.5)/2
-   #FOLD_0_JOINT[row, col]*0.55+FOLD_1[row,col]*0.45+FOLD_2[row,col]*0.3 < FOLD_0_MIX_TRESH[col]*0.55+FOLD_1_TRESH[col]*0.45+FOLD_2_TRESH[col]*0.3
-   #FOLD_0_JOINT[row, col]*0.6+FOLD_1[row,col]*0.45+FOLD_2[row,col]*0.2+FOLD_3[row,col]*0.3 < FOLD_0_MIX_TRESH[col]*0.55+FOLD_1_TRESH[col]*0.3+FOLD_2_TRESH[col]*0.2+FOLD_3_TRESH[col]*0.3
-   #FOLD_0_JOINT[row, col]*0.5+FOLD_1[row,col]*0.4+FOLD_2[row,col]*0.15+FOLD_3[row,col]*0.3 < FOLD_0_MIX_TRESH[col]*0.5+FOLD_1_TRESH[col]*0.4+FOLD_2_TRESH[col]*0.15+FOLD_3_TRESH[col]*0.3
 
    CP=[
        (FOLD_0_JOINT,FOLD_0_MIX_TRESH),
@@ -227,12 +207,13 @@ def main():
        (FOLD_4, FOLD_4_TRESH)
        ]
 
+   OTHER_FOLDS=FOLD_2+FOLD_3+FOLD_4
+   OTHER_FOLDS_TRESH=FOLD_2_TRESH+FOLD_3_TRESH+FOLD_4_TRESH;
    for row in tqdm(range(submit.shape[0])):
          str_label = ''
          for col in range(FOLD_0_0.shape[1]):
 
-             if FOLD_0_JOINT[row,col]*0.7+FOLD_1_1[row,col]+FOLD_1[row,col]+FOLD_2[row,col]*0.2+FOLD_4[row,col]*0.2+FOLD_3[row,col]*0.2 <\
-                     FOLD_1_MIX_TRESH[col]+FOLD_0_MIX_TRESH[col]*0.7+FOLD_2_TRESH[col]*0.2+FOLD_4_TRESH[col]*0.2+FOLD_3_TRESH[col]*0.2:
+             if FOLD_0_JOINT[row,col]+FOLD_1_JOINT[row,col]*0.95+OTHER_FOLDS[row,col]*0.4 <FOLD_0_MIX_TRESH[col]+FOLD_1_MIX_TRESH[col]*0.87+OTHER_FOLDS_TRESH[col]*0.35:
                  str_label += ''
              else:
                  str_label += str(col) + ' '
