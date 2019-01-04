@@ -152,7 +152,7 @@ def main():
    tg2 = ProteinDataGenerator(paths2, labels2)
 
 
-   cfg=classification.parse("./xc2/proteins.yaml")
+   cfg=classification.parse("./resnet34/proteins.yaml")
    #cfg0=classification.parse("./xception-clr/proteins.yaml")
    classification.extra_train["train2"]=tg2
    # finder=cfg.lr_find(tg,stage=2,epochs=1)
