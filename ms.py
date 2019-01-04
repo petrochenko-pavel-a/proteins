@@ -19,54 +19,51 @@ def getTrainDataset():
     return np.array(paths), np.array(labels)
 
 
+def split(X,y):
 
-# import numpy as np
-# X = np.array([[1, 2], [3, 4], [1, 2], [3, 4], [1, 2], [3, 4]])
-# y = np.array([[1, 2], [0, 1,2], [1, 2], [0, 3], [0, 3], [3, 1]])
-X,y= getTrainDataset();
-
-all=np.arange(y.shape[0])
+    all=np.arange(y.shape[0])
 
 
-currentSet=set(all)
+    currentSet=set(all)
 
-rs=[]
-for c in range(y.shape[1]):
-    goodClasss=np.where(y[:,c]>0)[0]
-    rs.append(len(goodClasss))
-    print(len(goodClasss),c)
-    len(goodClasss)
-zz=np.argsort(np.array(rs))
+    rs=[]
+    for c in range(y.shape[1]):
+        goodClasss=np.where(y[:,c]>0)[0]
+        rs.append(len(goodClasss))
+        print(len(goodClasss),c)
+        len(goodClasss)
+    zz=np.argsort(np.array(rs))
 
-trainSet=set()
-testSet=set()
+    trainSet=set()
+    testSet=set()
 
-np.random.seed(12)
-for v in zz:
-    # now we should start choosing examples
-    goodClasss = np.where(y[:, v] > 0)[0]
-    np.random.shuffle(goodClasss)
-    test=0
-    train=0
-    for c in goodClasss:
+    np.random.seed(12)
+    for v in zz:
+        # now we should start choosing examples
+        goodClasss = np.where(y[:, v] > 0)[0]
+        np.random.shuffle(goodClasss)
+        test=0
+        train=0
+        for c in goodClasss:
 
-        if test*5<train:
-            if not c in trainSet:
-                testSet.add(c)
-                test=test+1
+            if test*5<train:
+                if not c in trainSet:
+                    testSet.add(c)
+                    test=test+1
+                else:
+                    train=train+1
+                    trainSet.add(c);
             else:
-                train=train+1
-                trainSet.add(c);
-        else:
-            if not c in testSet:
-                train = train + 1
-                trainSet.add(c);
-            else:
-                testSet.add(c)
-                test = test + 1
-    print(test,train)
-    # vv=goodClasss
-    # vv1=vv[:vv.shape[0]//5]
-    # vv2=vv[vv.shape[0]//5:]
-tt=y[np.array(list(trainSet)),:]
-print(tt)
+                if not c in testSet:
+                    train = train + 1
+                    trainSet.add(c);
+                else:
+                    testSet.add(c)
+                    test = test + 1
+        print(test,train)
+        # vv=goodClasss
+        # vv1=vv[:vv.shape[0]//5]
+        # vv2=vv[vv.shape[0]//5:]
+    trainX,trainY=X[[np.array(list(trainSet))]], y[np.array(list(trainSet)),:]
+    testX, testY = X[[np.array(list(testSet))]], y[np.array(list(testSet)), :]
+    return ([trainX,trainY],[testX,testY])

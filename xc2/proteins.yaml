@@ -1,4 +1,4 @@
-architecture: Xception
+architecture: DenseNet121
 pooling: avg
 augmentation:
  Fliplr: 0.5
@@ -27,7 +27,7 @@ callbacks:
     verbose: 1
   CyclicLR:
     base_lr: 0.00001
-    max_lr: 0.0005
+    max_lr: 0.0001
     mode: triangular2
     step_size: 32432
 loss: binary_crossentropy

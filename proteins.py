@@ -8,7 +8,7 @@ import os
 from PIL import Image
 from tqdm import tqdm
 from sklearn.metrics import f1_score as off1
-
+import ms
 
 class ProteinDataGenerator:
 
@@ -135,9 +135,17 @@ def load(p):
 def main():
    paths, labels = getTrainDataset()
 
+   trainD,testD=ms.split(paths,labels)
+
    pathsTest, labelsTest = getTestDataset()
-   tg = ProteinDataGenerator(paths, labels )
+   tg = ProteinDataGenerator(trainD[0], trainD[1] )
    testg = ProteinDataGenerator(pathsTest, labelsTest)
+   with open("train.txt","w") as f:
+       for l in trainD[0]:
+           f.write(l+"\r")
+   with open("test.txt","w") as f:
+       for l in testD[0]:
+           f.write(l+"\r")
 
    paths2, labels2 = getTrainDataset2()
 
@@ -145,7 +153,7 @@ def main():
 
 
    cfg=classification.parse("./xc2/proteins.yaml")
-   cfg0=classification.parse("./xception-clr/proteins.yaml")
+   #cfg0=classification.parse("./xception-clr/proteins.yaml")
    classification.extra_train["train2"]=tg2
    # finder=cfg.lr_find(tg,stage=2,epochs=1)
    # finder.plot_loss(n_skip_beginning=20, n_skip_end=5)
