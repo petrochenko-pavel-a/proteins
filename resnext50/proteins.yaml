@@ -6,7 +6,7 @@ augmentation:
 classes: 28
 activation: sigmoid
 weights: imagenet
-extra_train_data: train2
+#extra_train_data: train2
 shape: [512, 512, 4]
 optimizer: Adam
 batch: 10

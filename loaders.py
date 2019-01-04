@@ -31,6 +31,39 @@ class ProteinDataGenerator:
         ), -1)
         return im
 
+class ProteinDataGeneratorClazz:
+
+    def __init__(self, paths, labels,clazz):
+        self.paths, self.labels = paths, labels
+        self.clazz=clazz
+
+    def __len__(self):
+        return len(self.paths)
+
+    def __getitem__(self, idx):
+        X,y = self.__load_image(self.paths[idx]),self.labels[idx]
+        y1=np.array([y[self.clazz]])
+        return PredictionItem(self.paths[idx],X, y1)
+
+    def isPositive(self, item):
+        v=self.labels[item]
+
+        return v[self.clazz]==1
+
+    def __load_image(self, path):
+        R = Image.open(path + '_red.png')
+        G = Image.open(path + '_green.png')
+        B = Image.open(path + '_blue.png')
+        Y = Image.open(path + '_yellow.png')
+
+        im = np.stack((
+            np.array(R),
+            np.array(G),
+            np.array(B),
+            np.array(Y)
+        ), -1)
+        return im
+
 def getTrainDataset():
     path_to_train = DIR + '/train/'
     data = pd.read_csv(DIR + '/train.csv')
@@ -40,6 +73,22 @@ def getTrainDataset():
         y = np.zeros(28)
         for key in lbl:
             y[int(key)] = 1
+        paths.append(os.path.join(path_to_train, name))
+        labels.append(y)
+    return np.array(paths), np.array(labels)
+
+
+
+def getTrainDatasetForClass(clazz):
+    path_to_train = DIR + '/train/'
+    data = pd.read_csv(DIR + '/train.csv')
+    paths = []
+    labels = []
+    for name, lbl in zip(data['Id'], data['Target'].str.split(' ')):
+        y = np.zeros(1)
+        for key in lbl:
+            if key==clazz:
+                y[int(key)] = 1
         paths.append(os.path.join(path_to_train, name))
         labels.append(y)
     return np.array(paths), np.array(labels)

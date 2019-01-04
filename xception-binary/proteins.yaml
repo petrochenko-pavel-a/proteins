@@ -1,24 +1,21 @@
-architecture: DenseNet201
-pooling: avg
+architecture: Xception
+#pooling: avg
 augmentation:
  Fliplr: 0.5
  Flipud: 0.5
- Rotate90: true
-classes: 28
+classes: 1
 activation: sigmoid
 weights: imagenet
-#extra_train_data: train2
 shape: [512, 512, 4]
 optimizer: Adam
 batch: 10
-lr: 0.0001
+lr: 0.001
 copyWeights: true
 metrics:
   - binary_accuracy
   - macro_f1
 primary_metric: val_macro_f1
 primary_metric_mode: max
-
 callbacks:
   EarlyStopping:
     patience: 15
@@ -26,13 +23,15 @@ callbacks:
     mode: max
     verbose: 1
   CyclicLR:
-    base_lr: 0.000001
-    max_lr: 0.00001
+    base_lr: 0.00001
+    max_lr: 0.0001
     mode: triangular2
-    step_size: 35768
-loss: focal_loss
+    step_size: 9528
+loss: binary_crossentropy
 stages:
-  - epochs: 150
-    loss: focal_loss
-  #- epochs: 150
-  #  loss: focal_loss
+  - epochs: 10
+    negatives: 100
+    validation_negatives: 100
+  - epochs: 10
+    negatives: 1000
+    validation_negatives: real

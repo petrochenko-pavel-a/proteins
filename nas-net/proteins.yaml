@@ -12,7 +12,7 @@ optimizer: Adam
 batch: 6
 lr: 0.0002
 copyWeights: true
-extra_train_data: train2
+#extra_train_data: train2
 metrics:
   - binary_accuracy
   - macro_f1

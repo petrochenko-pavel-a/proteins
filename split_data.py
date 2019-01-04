@@ -38,10 +38,10 @@ def split(X,y):
     testSet=set()
 
     np.random.seed(12)
-    if os.path.exists("train.txt"):
-        with open("train.txt","r") as f:
+    if os.path.exists("./train.txt"):
+        with open("./train.txt","r") as f:
             trainLines=[x.strip() for x in f.readlines()]
-        with open("test.txt","r") as f:
+        with open("./test.txt","r") as f:
             testLines=[x.strip() for x in f.readlines()]
             #just for debug
         for v in range(y.shape[0]):
