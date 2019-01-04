@@ -8,76 +8,8 @@ import os
 from PIL import Image
 from tqdm import tqdm
 from sklearn.metrics import f1_score as off1
-import ms
-
-class ProteinDataGenerator:
-
-    def __init__(self, paths, labels):
-        self.paths, self.labels = paths, labels
-
-
-    def __len__(self):
-        return len(self.paths)
-
-    def __getitem__(self, idx):
-        X,y = self.__load_image(self.paths[idx]),self.labels[idx]
-        return PredictionItem(self.paths[idx],X, y)
-
-    def __load_image(self, path):
-        R = Image.open(path + '_red.png')
-        G = Image.open(path + '_green.png')
-        B = Image.open(path + '_blue.png')
-        Y = Image.open(path + '_yellow.png')
-
-        im = np.stack((
-            np.array(R),
-            np.array(G),
-            np.array(B),
-            np.array(Y)
-        ), -1)
-        return im
-
-DIR = 'D:/cells'
-
-def getTrainDataset():
-    path_to_train = DIR + '/train/'
-    data = pd.read_csv(DIR + '/train.csv')
-    paths = []
-    labels = []
-    for name, lbl in zip(data['Id'], data['Target'].str.split(' ')):
-        y = np.zeros(28)
-        for key in lbl:
-            y[int(key)] = 1
-        paths.append(os.path.join(path_to_train, name))
-        labels.append(y)
-    return np.array(paths), np.array(labels)
-
-def getTrainDataset2():
-    path_to_train = DIR + '/train2/'
-    data = pd.read_csv(DIR + '/train2.csv')
-    paths = []
-    labels = []
-    for name, lbl in zip(data['Id'], data['Target'].str.split(' ')):
-        y = np.zeros(28)
-        for key in lbl:
-            i=int(key)
-            if i<28:
-               y[i] = 1
-        paths.append(os.path.join(path_to_train, name))
-        labels.append(y)
-    return np.array(paths), np.array(labels)
-
-def getTestDataset():
-    path_to_test = DIR + '/test/'
-    data = pd.read_csv(DIR + '/sample_submission.csv')
-    paths = []
-    labels = []
-    for name in data['Id']:
-        y = np.ones(28)
-        paths.append(os.path.join(path_to_test, name))
-        labels.append(y)
-
-    return np.array(paths), np.array(labels)
+import split_data
+import loaders
 
 
 def getOptimalT(lastFullValPred,lastFullValLabels):
@@ -133,13 +65,13 @@ def load(p):
         return pickle.load(f)
 
 def main():
-   paths, labels = getTrainDataset()
+   paths, labels = loaders.getTrainDataset()
 
-   trainD,testD=ms.split(paths,labels)
+   trainD,testD=split_data.split(paths, labels)
 
-   pathsTest, labelsTest = getTestDataset()
-   tg = ProteinDataGenerator(trainD[0], trainD[1] )
-   testg = ProteinDataGenerator(pathsTest, labelsTest)
+   pathsTest, labelsTest = loaders.getTestDataset()
+   tg = loaders.ProteinDataGenerator(trainD[0], trainD[1] )
+   testg = loaders.ProteinDataGenerator(pathsTest, labelsTest)
    with open("train.txt","w") as f:
        for l in trainD[0]:
            f.write(l+"\r")
@@ -147,14 +79,14 @@ def main():
        for l in testD[0]:
            f.write(l+"\r")
 
-   paths2, labels2 = getTrainDataset2()
+   paths2, labels2 = loaders.getTrainDataset2()
 
-   tg2 = ProteinDataGenerator(paths2, labels2)
-
+   extra_data = loaders.ProteinDataGenerator(paths2, labels2)
+   classification.extra_train["train2"] = extra_data
 
    cfg=classification.parse("./xc2/proteins.yaml")
    cfg0=classification.parse("./xception-clr/proteins.yaml")
-   classification.extra_train["train2"]=tg2
+
    # finder=cfg.lr_find(tg,stage=2,epochs=1)
    # finder.plot_loss(n_skip_beginning=20, n_skip_end=5)
    # plt.show()
