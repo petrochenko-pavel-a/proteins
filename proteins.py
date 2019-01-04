@@ -84,7 +84,7 @@ def main():
    extra_data = loaders.ProteinDataGenerator(paths2, labels2)
    classification.extra_train["train2"] = extra_data
 
-   cfg=classification.parse("./xc2/proteins.yaml")
+   cfg=classification.parse("./densenet201/proteins.yaml")
    cfg0=classification.parse("./xception-clr/proteins.yaml")
 
    # finder=cfg.lr_find(tg,stage=2,epochs=1)

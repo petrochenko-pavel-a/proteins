@@ -3,13 +3,14 @@ pooling: avg
 augmentation:
  Fliplr: 0.5
  Flipud: 0.5
+ Rotate90: true
 classes: 28
 activation: sigmoid
 weights: imagenet
 extra_train_data: train2
-shape: [256, 256, 4]
+shape: [512, 512, 4]
 optimizer: Adam
-batch: 32
+batch: 10
 lr: 0.0001
 copyWeights: true
 metrics:
@@ -25,24 +26,13 @@ callbacks:
     mode: max
     verbose: 1
   CyclicLR:
-    base_lr: 0.00001
-    max_lr: 0.005
-    mode: triangular
-    step_size: 3000
+    base_lr: 0.000001
+    max_lr: 0.00001
+    mode: triangular2
+    step_size: 32432
 loss: binary_crossentropy
 stages:
-  - epochs: 50
-  - epochs: 50
-    callbacks:
-      CyclicLR:
-        base_lr: 0.00001
-        max_lr: 0.002
-        mode: triangular2
-        step_size: 6216
-  - epochs: 50
-    callbacks:
-      CyclicLR:
-        base_lr: 0.00001
-        max_lr: 0.0002
-        mode: triangular2
-        step_size: 6216
+  - epochs: 150
+    loss: binary_crossentropy
+  #- epochs: 150
+  #  loss: focal_loss
