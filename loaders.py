@@ -4,11 +4,14 @@ from PIL import Image
 import pandas as pd
 import os
 DIR="D:/cells"
+
+
 class ProteinDataGenerator:
 
-    def __init__(self, paths, labels):
-        self.paths, self.labels = paths, labels
-
+    def __init__(self, paths, labels, glued_images=True):
+        self.paths = paths
+        self.labels = labels
+        self.glued_images = glued_images
 
     def __len__(self):
         return len(self.paths)
@@ -18,24 +21,31 @@ class ProteinDataGenerator:
         return PredictionItem(self.paths[idx],X, y)
 
     def __load_image(self, path):
-        R = Image.open(path + '_red.png')
-        G = Image.open(path + '_green.png')
-        B = Image.open(path + '_blue.png')
-        Y = Image.open(path + '_yellow.png')
+        if self.glued_images:
+            im = np.array(
+                Image.open(path + '.png')
+            )
+        else:
+            R = Image.open(path + '_red.png')
+            G = Image.open(path + '_green.png')
+            B = Image.open(path + '_blue.png')
+            Y = Image.open(path + '_yellow.png')
 
-        im = np.stack((
-            np.array(R),
-            np.array(G),
-            np.array(B),
-            np.array(Y)
-        ), -1)
+            im = np.stack((
+                np.array(R),
+                np.array(G),
+                np.array(B),
+                np.array(Y)
+            ), -1)
+            
         return im
 
 class ProteinDataGeneratorClazz:
 
-    def __init__(self, paths, labels,clazz):
+    def __init__(self, paths, labels, clazz, glued_images):
         self.paths, self.labels = paths, labels
         self.clazz=clazz
+        self.glued_images = glued_images
 
     def __len__(self):
         return len(self.paths)
@@ -51,22 +61,27 @@ class ProteinDataGeneratorClazz:
         return v[self.clazz]==1
 
     def __load_image(self, path):
-        R = Image.open(path + '_red.png')
-        G = Image.open(path + '_green.png')
-        B = Image.open(path + '_blue.png')
-        Y = Image.open(path + '_yellow.png')
+        if self.glued_images:
+            im = np.array(
+                Image.open(path + '.png')
+            )
+        else:
+            R = Image.open(path + '_red.png')
+            G = Image.open(path + '_green.png')
+            B = Image.open(path + '_blue.png')
+            Y = Image.open(path + '_yellow.png')
 
-        im = np.stack((
-            np.array(R),
-            np.array(G),
-            np.array(B),
-            np.array(Y)
-        ), -1)
+            im = np.stack((
+                np.array(R),
+                np.array(G),
+                np.array(B),
+                np.array(Y)
+            ), -1)
         return im
-
-def getTrainDataset():
-    path_to_train = DIR + '/train/'
-    data = pd.read_csv(DIR + '/train.csv')
+    
+def getTrainDataset(data_path=DIR, images_dir='train', pd_file='train.csv'):
+    path_to_train = f"{DIR}/{images_dir}/"
+    data = pd.read_csv(f"{DIR}/{pd_file}")
     paths = []
     labels = []
     for name, lbl in zip(data['Id'], data['Target'].str.split(' ')):
@@ -76,7 +91,6 @@ def getTrainDataset():
         paths.append(os.path.join(path_to_train, name))
         labels.append(y)
     return np.array(paths), np.array(labels)
-
 
 
 def getTrainDatasetForClass(clazz):
@@ -93,9 +107,9 @@ def getTrainDatasetForClass(clazz):
         labels.append(y)
     return np.array(paths), np.array(labels)
 
-def getTrainDataset2():
-    path_to_train = DIR + '/train2/'
-    data = pd.read_csv(DIR + '/train2.csv')
+def getTrainDataset2(data_path=DIR, images_dir='train2', pd_file='train2.csv'):
+    path_to_train = f"{DIR}/{images_dir}/"
+    data = pd.read_csv(f"{DIR}/{pd_file}")
     paths = []
     labels = []
     for name, lbl in zip(data['Id'], data['Target'].str.split(' ')):

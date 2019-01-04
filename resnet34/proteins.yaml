@@ -9,7 +9,7 @@ weights: imagenet
 #extra_train_data: train2
 shape: [512, 512, 4]
 optimizer: Adam
-batch: 10
+batch: 16
 lr: 0.0001
 copyWeights: true
 metrics:
@@ -32,5 +32,6 @@ loss: binary_crossentropy
 stages:
   - epochs: 150
     loss: binary_crossentropy
+#     initial_weights: ./resnet34/weights/best-2.0.weights
   #- epochs: 150
   #  loss: focal_loss

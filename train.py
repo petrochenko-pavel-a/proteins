@@ -5,8 +5,11 @@ import musket_core.datasets as ds
 import pandas as pd
 import os
 import numpy as np
+
+
 def main():
     parser = argparse.ArgumentParser(description='Training for proteins')
+    
     parser.add_argument('--inputFile', type=str, default="./proteins.yaml",
                         help='learner config')
     parser.add_argument('--fold', type=int, default=0,
@@ -21,6 +24,10 @@ def main():
                         help='stage')
     parser.add_argument('--ql', type=int, default=20,
                         help='stage')
+    
+    parser.add_argument('--gluedImages', type=bool, required=True)
+    parser.add_argument('--trainImagesDir', type=str)
+    parser.add_argument('--extraTrainImagesDir', type=str)
 
     args = parser.parse_args()
     if args.workers>0:
@@ -31,15 +38,26 @@ def main():
         loaders.DIR=args.dir
 
 
-    paths, labels = loaders.getTrainDataset()
-    paths2, labels2 = loaders.getTrainDataset2()
-    paths = np.concatenate([paths2, paths])
+    paths, labels = loaders.getTrainDataset(images_dir=args.trainImagesDir)
+    paths2, labels2 = loaders.getTrainDataset2(images_dir=args.extraTrainImagesDir)
+    paths = np.concatenate([paths, paths2])
     labels = np.concatenate([labels, labels2])
 
     foldIndexes = calculate_fold_indexes(paths)
 
-    tg = loaders.ProteinDataGenerator(paths, labels)
+    tg = loaders.ProteinDataGenerator(paths, labels, glued_images=args.gluedImages)
     tg.folds = foldIndexes;
+
+#     paths, labels = loaders.getTrainDataset(images_dir=args.trainImagesDir, 
+#                                             pd_file=args.trainPdFile)
+
+#     trainD, testD = split_data.split(paths, labels)
+#     tg = loaders.ProteinDataGenerator(trainD[0], trainD[1], glued_images=args.gluedImages)
+
+#     paths2, labels2 = loaders.getTrainDataset2(images_dir=args.extraTrainImagesDir, 
+#                                                pd_file=args.extraTrainPdFile)
+#     extra_data = loaders.ProteinDataGenerator(paths2, labels2, glued_images=args.gluedImages)
+#     classification.extra_train["train2"] = extra_data
 
     cfg = classification.parse(args.inputFile)
 
