@@ -8,6 +8,19 @@ import numpy as np
 
 
 def main():
+    """
+    Example for a single GPU:
+    
+        CUDA_VISIBLE_DEVICES=3 python train.py --inputFile resnet34/proteins.yaml \
+                                               --fold 4 \
+                                               --dir /media/1t/protein/data \
+                                               --gpus 1 \
+                                               --workers 8 \
+                                               --gluedImages True \
+                                               --trainImagesDir train_glued_cv2 \
+                                               --extraTrainImagesDir external_data_512_glued_cv2 \
+                                               --ql 256
+    """
     parser = argparse.ArgumentParser(description='Training for proteins')
     
     parser.add_argument('--inputFile', type=str, default="./proteins.yaml",
