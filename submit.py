@@ -32,7 +32,7 @@ def main():
 
     predictions = get_or_calculate_test_predictions(args, cfg)
 
-    tresholds=eval.get_or_calculate_tresholds(args)
+    tresholds=eval.get_or_calculate_tresholds(args)[0]
     create_submission(predictions, tresholds)
 
 
@@ -43,7 +43,7 @@ def create_submission(predictions, tresholds):
         str_label = ''
         for col in range(predictions.shape[1]):
 
-            if predictions[row, col] < tresholds[row, col]:
+            if predictions[row, col] < tresholds[col]:
                 str_label += ''
             else:
                 str_label += str(col) + ' '
