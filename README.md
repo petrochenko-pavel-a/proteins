@@ -29,3 +29,9 @@ TEST_SUBDIR =        os.getenv('TEST_SUBDIR', 'test')
 GLUED_IMAGES=True TRAIN_SUBDIR=train_glued_cv2 EXTRA_TRAIN_SUBDIR=external_data_512_glued_cv2 CUDA_VISIBLE_DEVICES=2 python eval.py --inp
 utFile ./resnet34/proteins.yaml --fold 3 --dir /media/1t/protein/data
 ```
+
+## Submit example
+
+```sh
+MAIN_DIR=/media/1t/protein/data CUDA_VISIBLE_DEVICES=1,2 python submit.py --inputFile ./resnet34/proteins.yaml --fold 2
+```
