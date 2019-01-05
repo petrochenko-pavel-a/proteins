@@ -4,6 +4,7 @@ from PIL import Image
 import pandas as pd
 import os
 DIR="D:/cells"
+import musket_core.datasets as ds
 class ProteinDataGenerator:
 
     def __init__(self, paths, labels):
@@ -22,13 +23,15 @@ class ProteinDataGenerator:
         G = Image.open(path + '_green.png')
         B = Image.open(path + '_blue.png')
         Y = Image.open(path + '_yellow.png')
-
-        im = np.stack((
-            np.array(R),
-            np.array(G),
-            np.array(B),
-            np.array(Y)
-        ), -1)
+        try:
+            im = np.stack((
+                np.array(R),
+                np.array(G),
+                np.array(B),
+                np.array(Y)
+            ), -1)
+        except:
+            return np.zeros((512,512,4))
         return im
 
 class ProteinDataGeneratorClazz:
@@ -77,7 +80,33 @@ def getTrainDataset():
         labels.append(y)
     return np.array(paths), np.array(labels)
 
+def calculate_fold_indexes(paths):
+    foldSets = []
+    foldIndexes = []
+    for i in range(1, 6):
+        train = pd.read_csv("./folds/fold" + str(i) + "_train.csv")
+        test = pd.read_csv("./folds/fold" + str(i) + "_val.csv")
+        foldSets.append((set(train["Id"].values), set(test["Id"].values)))
+        foldIndexes.append([[], []])
+    for i in range(len(paths)):
+        bn = os.path.basename(paths[i])
+        for j in range(len(foldSets)):
+            if bn in foldSets[j][0]:
+                foldIndexes[j][0].append(i)
+            if bn in foldSets[j][1]:
+                foldIndexes[j][1].append(i)
+    return foldIndexes
 
+
+def calculate_holdout_indexes(paths):
+    train = pd.read_csv("./folds/holdout.csv" )
+    fold=set(train["Id"].values)
+    foldIndexes=[]
+    for i in range(len(paths)):
+        bn = os.path.basename(paths[i])
+        if bn in fold:
+            foldIndexes.append(i);
+    return foldIndexes
 
 def getTrainDatasetForClass(clazz):
     path_to_train = DIR + '/train/'
@@ -119,3 +148,25 @@ def getTestDataset():
         labels.append(y)
 
     return np.array(paths), np.array(labels)
+
+def createDataSet():
+    paths, labels = getTrainDataset()
+    paths2, labels2 = getTrainDataset2()
+    paths = np.concatenate([paths2, paths])
+    labels = np.concatenate([labels2, labels])
+    foldIndexes = calculate_fold_indexes(paths)
+    tg = ProteinDataGenerator(paths, labels)
+    tg.folds = foldIndexes;
+    return tg
+
+def createHoldoutDataSet():
+    paths, labels = getTrainDataset()
+    paths2, labels2 = getTrainDataset2()
+    paths = np.concatenate([paths2, paths])
+    labels = np.concatenate([labels2, labels])
+    foldIndexes = calculate_fold_indexes(paths)
+    tg = ProteinDataGenerator(paths, labels)
+    tg.folds = foldIndexes;
+    hi = calculate_holdout_indexes(paths)
+    test = ds.SubDataSet(tg, hi)
+    return test,labels[hi]
