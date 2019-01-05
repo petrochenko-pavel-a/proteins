@@ -28,7 +28,7 @@ class ProteinDataGenerator:
 
     def __load_image(self, path):
         if GLUED_IMAGES:
-            im = Image.open(path)
+            im = np.array(Image.open(path + '.png'))
         else:
             R = Image.open(path + '_red.png')
             G = Image.open(path + '_green.png')
