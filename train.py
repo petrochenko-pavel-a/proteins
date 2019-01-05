@@ -20,12 +20,21 @@ def main():
                         help='stage')
     parser.add_argument('--ql', type=int, default=20,
                         help='stage')
+    parser.add_argument('--loader_workers', type=int, default=1,
+                        help='loader workers')
+    parser.add_argument('--loader_threaded', type=bool, default=True,
+                        help='loader is threaded')
+    parser.add_argument('--loader_size', type=int, default=50,
+                        help='loader quee size')
 
     args = parser.parse_args()
     if args.workers>0:
         ds.USE_MULTIPROCESSING=True
         ds.NB_WORKERS=args.workers
         ds.AUGMENTER_QUEUE_LIMIT = args.ql
+        ds.NB_WORKERS_IN_LOADER =args.loader_workers
+        ds.LOADER_SIZE = args.loader_size
+        ds.LOADER_THREADED = args.loader_threaded
     if args.dir!="":
         loaders.DIR=args.dir
 
