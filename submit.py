@@ -55,7 +55,7 @@ def create_submission(predictions, tresholds):
 def get_or_calculate_test_predictions(args, cfg):
     ps = args.inputFile + ".test_pred." + str(args.fold) + "." + str(args.stage)
     if not os.path.exists(ps):
-        predictions = cfg.predict_all_to_array(loaders.getTestDataSet(), 1, 0, ttflips=True, batch_size=64)
+        predictions = cfg.predict_all_to_array(loaders.getTestDataSet(), args.fold, args.stage, ttflips=True, batch_size=64)
         utils.save(ps, predictions)
     predictions = utils.load(ps);
     return predictions
