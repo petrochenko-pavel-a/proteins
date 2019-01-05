@@ -3,12 +3,12 @@ architecture: Xception
 augmentation:
  Fliplr: 0.5
  Flipud: 0.5
-classes: 1
+classes: 28
 activation: sigmoid
 weights: imagenet
-shape: [512, 512, 4]
+shape: [256, 256, 4]
 optimizer: Adam
-batch: 10
+batch: 40
 lr: 0.001
 copyWeights: true
 metrics:
@@ -26,12 +26,8 @@ callbacks:
     base_lr: 0.00001
     max_lr: 0.0001
     mode: triangular2
-    step_size: 9528
+    step_size: 10000
 loss: binary_crossentropy
 stages:
-  - epochs: 10
-    negatives: 100
-    validation_negatives: 100
-  - epochs: 10
-    negatives: 1000
-    validation_negatives: real
+  - epochs: 100
+

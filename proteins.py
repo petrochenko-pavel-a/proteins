@@ -69,9 +69,9 @@ def main():
 
    trainD,testD=split_data.split(paths, labels)
 
-   pathsTest, labelsTest = loaders.getTestDataset()
+
    tg = loaders.ProteinDataGenerator(trainD[0], trainD[1] )
-   testg = loaders.ProteinDataGenerator(pathsTest, labelsTest)
+
    with open("train.txt","w") as f:
        for l in trainD[0]:
            f.write(l+"\r")

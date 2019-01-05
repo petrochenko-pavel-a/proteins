@@ -137,7 +137,7 @@ def getTrainDataset2():
         labels.append(y)
     return np.array(paths), np.array(labels)
 
-def getTestDataset():
+def get_test_paths_and_ids():
     path_to_test = DIR + '/test/'
     data = pd.read_csv(DIR + '/sample_submission.csv')
     paths = []
@@ -170,3 +170,11 @@ def createHoldoutDataSet():
     hi = calculate_holdout_indexes(paths)
     test = ds.SubDataSet(tg, hi)
     return test,labels[hi]
+
+def getSubmitSample():
+    return pd.read_csv(DIR + '/sample_submission.csv')
+
+
+def getTestDataSet():
+    pathsTest, labelsTest = get_test_paths_and_ids()
+    return ProteinDataGenerator(pathsTest, labelsTest)

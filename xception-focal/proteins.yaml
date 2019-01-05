@@ -31,3 +31,10 @@ loss: binary_crossentropy
 stages:
   - epochs: 150
     loss: binary_crossentropy
+  - epochs: 50
+    callbacks:
+      CyclicLR:
+        base_lr: 0.000001
+        max_lr: 0.00001
+        mode: triangular2
+        step_size: 30528
