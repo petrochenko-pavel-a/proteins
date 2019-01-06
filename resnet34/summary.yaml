@@ -1,0 +1,4 @@
+cfgName: proteins.yaml
+completed: true
+folds: [4]
+subsample: 1.0
