@@ -23,10 +23,10 @@ callbacks:
     mode: max
     verbose: 1
   CyclicLR:
-    base_lr: 0.00001
+    base_lr: 0.000001
     max_lr: 0.0001
     mode: triangular2
-    step_size: 9528
+    step_size: 35828
 loss: binary_crossentropy
 stages:
   - epochs: 150

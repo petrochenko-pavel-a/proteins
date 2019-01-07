@@ -3,9 +3,8 @@ from sklearn.metrics.classification import f1_score
 
 class DataGenerator:
 
-    def __init__(self,fraction,noiseProb,count):
+    def __init__(self,fraction,count):
         self.fraction=fraction
-        self.noiseProb=noiseProb
         self.data=None
         self.val = None
         self.count=count;
@@ -29,25 +28,19 @@ class DataGenerator:
         self.val=zeros;
         return zeros
 
-def noise(input,mean,variance):
-    m= input+np.random.normal(mean,variance,input.shape[0])
-    return (m-m.min())/(m.max()-m.min())
+class Noised:
+    def __init__(self,mean,variance,len):
+        self.noise=np.random.normal(mean,variance,len)
+
+    def apply(self,input):
+        m = input + self.noise;
+        return (m - m.min()) / (m.max() - m.min())
+
 
 def estimate(d,v,tr):
     return f1_score(d > 0.5, v>tr)
 
-dg=DataGenerator(0.1, 0.2,1000);
-
-v=dg.get()
-
-def toPred(v,num):
-    d=None
-    for i in range(num):
-        if d is None:
-            d=noise(v,0.5,0.6)
-        else d=d+noise(v,0.5,0.6)
-    d=d/len(num)
-    return d;
+dg=DataGenerator(0.05, 1000);
 
 def optimal(v,d):
     maxVal=0;
@@ -59,11 +52,40 @@ def optimal(v,d):
             t=i*0.05
     return maxVal,t
 
+v=dg.get()
 
-r=optimal(v,toPred(v))
+import random
 
-test=toPred(dg.validation())
+def est(count):
+    est=[]
+    for i in range(0,100):
+        estimators = []
+        rates = []
+        for i in range(count):
+            n=Noised(random.random(),0.6+random.random(),1000)
+            estimators.append(n)
+            rates.append(optimal(v,n.apply(v)))
 
-print(r)
+        #print(optimal(v,n1.apply(v)))
 
-print(estimate(dg.validation(),test,r[1]))
+        test=dg.validation()
+
+        allPred=[]
+        sr=0
+        for i in range(len(estimators)):
+            n=estimators[i]
+            #tr=rates[i][1]
+            sr=sr+rates[i][1]
+            predictions=n.apply(test);
+            allPred.append(predictions);
+            #print(estimate(test,predictions,tr))
+
+        allPred=np.array(allPred).sum(axis=0)
+        est.append(estimate(test, allPred, sr))
+    return np.array(est).mean()
+
+for i in range(2,15):
+    print(i,est(i))
+
+
+#print(allPred)

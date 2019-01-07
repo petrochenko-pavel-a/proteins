@@ -30,16 +30,22 @@ def main():
         ds.AUGMENTER_QUEUE_LIMIT = args.ql
     if args.dir!="":
         loaders.DIR=args.dir
+    if args.fold==100:
+        for i in range(5):
+            args.fold=i
+            doEval(args)
+    else:
+        doEval(args)
 
-    test,correct_labels=loaders.createHoldoutDataSet()
+
+def doEval(args):
+    test, correct_labels = loaders.createHoldoutDataSet()
     t = get_or_calculate_tresholds(args)
-
     predictions = get_or_calculate_holdout(args, test)
-
     for i in range(28):
-        print(i,f1_score(correct_labels[:,i],predictions[:,i]>t[0][i]))
-    print ("Macro F1:"+str(f1_score(correct_labels,predictions>t[0],average="macro")))
-    print ("Val Macro F1:",t[1])
+        print(i, f1_score(correct_labels[:, i], predictions[:, i] > t[0][i]))
+    print("Macro F1:" + str(f1_score(correct_labels, predictions > t[0], average="macro")))
+    print("Val Macro F1:", t[1])
 
 
 def get_or_calculate_holdout(args, test):
@@ -63,6 +69,7 @@ def get_or_calculate_tresholds(args):
         pred, labels = cfg.evaluate_all_to_arrays(train, fold=args.fold, stage=args.stage, ttflips=True)
         v = tresholds.getOptimalT(pred, labels)
         utils.save(ps, v)
+        utils.save(args.inputFile + ".validation_pred." + str(args.fold) + "." + str(args.stage), [pred,labels])
     t = utils.load(ps)
     return t
 

@@ -28,11 +28,18 @@ def main():
                         help='stage')
 
     args = parser.parse_args()
+    if args.fold==100:
+        for i in range(5):
+            args.fold=i
+            doAll(args)
+            pass
+    else: doAll(args)
+
+
+def doAll(args):
     cfg = classification.parse(args.inputFile)
-
     predictions = get_or_calculate_test_predictions(args, cfg)
-
-    tresholds=eval.get_or_calculate_tresholds(args)[0]
+    tresholds = eval.get_or_calculate_tresholds(args)[0]
     create_submission(predictions, tresholds)
 
 
