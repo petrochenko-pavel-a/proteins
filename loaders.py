@@ -3,7 +3,15 @@ from musket_core.datasets import PredictionItem
 from PIL import Image
 import pandas as pd
 import os
-DIR="D:/cells"
+
+DIR =                os.getenv('MAIN_DIR', 'D:/cells')
+GLUED_IMAGES =       os.getenv('GLUED_IMAGES', False)
+TRAIN_SUBDIR =       os.getenv('TRAIN_SUBDIR', 'train')
+EXTRA_TRAIN_SUBDIR = os.getenv('EXTRA_TRAIN_SUBDIR', 'train2')
+TRAIN_CSV =          os.getenv('TRAIN_CSV', 'train.csv')
+EXTRA_TRAIN_CSV =    os.getenv('EXTRA_TRAIN_CSV', 'train2.csv')
+TEST_SUBDIR =        os.getenv('TEST_SUBDIR', 'test')
+
 import musket_core.datasets as ds
 class ProteinDataGenerator:
 
@@ -19,19 +27,22 @@ class ProteinDataGenerator:
         return PredictionItem(self.paths[idx],X, y)
 
     def __load_image(self, path):
-        R = Image.open(path + '_red.png')
-        G = Image.open(path + '_green.png')
-        B = Image.open(path + '_blue.png')
-        Y = Image.open(path + '_yellow.png')
-        try:
-            im = np.stack((
-                np.array(R),
-                np.array(G),
-                np.array(B),
-                np.array(Y)
-            ), -1)
-        except:
-            return np.zeros((512,512,4))
+        if GLUED_IMAGES:
+            im = np.array(Image.open(path + '.png'))
+        else:
+            R = Image.open(path + '_red.png')
+            G = Image.open(path + '_green.png')
+            B = Image.open(path + '_blue.png')
+            Y = Image.open(path + '_yellow.png')
+            try:
+                im = np.stack((
+                    np.array(R),
+                    np.array(G),
+                    np.array(B),
+                    np.array(Y)
+                ), -1)
+            except:
+                return np.zeros((512,512,4))
         return im
 
 class ProteinDataGeneratorClazz:
@@ -68,8 +79,8 @@ class ProteinDataGeneratorClazz:
         return im
 
 def getTrainDataset():
-    path_to_train = DIR + '/train/'
-    data = pd.read_csv(DIR + '/train.csv')
+    path_to_train = DIR + f'/{TRAIN_SUBDIR}/'
+    data = pd.read_csv(DIR + f'/{TRAIN_CSV}')
     paths = []
     labels = []
     for name, lbl in zip(data['Id'], data['Target'].str.split(' ')):
@@ -109,8 +120,8 @@ def calculate_holdout_indexes(paths):
     return foldIndexes
 
 def getTrainDatasetForClass(clazz):
-    path_to_train = DIR + '/train/'
-    data = pd.read_csv(DIR + '/train.csv')
+    path_to_train = DIR + f'/{TRAIN_SUBDIR}/'
+    data = pd.read_csv(DIR + f'/{TRAIN_CSV}')
     paths = []
     labels = []
     for name, lbl in zip(data['Id'], data['Target'].str.split(' ')):
@@ -123,8 +134,8 @@ def getTrainDatasetForClass(clazz):
     return np.array(paths), np.array(labels)
 
 def getTrainDataset2():
-    path_to_train = DIR + '/train2/'
-    data = pd.read_csv(DIR + '/train2.csv')
+    path_to_train = DIR + f'/{EXTRA_TRAIN_SUBDIR}/'
+    data = pd.read_csv(DIR + f'/{EXTRA_TRAIN_CSV}')
     paths = []
     labels = []
     for name, lbl in zip(data['Id'], data['Target'].str.split(' ')):
@@ -138,7 +149,7 @@ def getTrainDataset2():
     return np.array(paths), np.array(labels)
 
 def get_test_paths_and_ids():
-    path_to_test = DIR + '/test/'
+    path_to_test = DIR + f'/{TEST_SUBDIR}/'
     data = pd.read_csv(DIR + '/sample_submission.csv')
     paths = []
     labels = []

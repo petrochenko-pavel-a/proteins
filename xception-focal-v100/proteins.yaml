@@ -1,4 +1,4 @@
-architecture: ResNet34
+architecture: Xception
 augmentation:
  Fliplr: 0.5
  Flipud: 0.5
@@ -6,10 +6,9 @@ augmentation:
 classes: 28
 activation: sigmoid
 weights: imagenet
-#extra_train_data: train2
 shape: [512, 512, 4]
 optimizer: Adam
-batch: 16
+batch: 14
 lr: 0.0001
 copyWeights: true
 metrics:
@@ -27,10 +26,15 @@ callbacks:
     base_lr: 0.00001
     max_lr: 0.0001
     mode: triangular2
-    step_size: 32432
+    step_size: 9528
 loss: binary_crossentropy
 stages:
   - epochs: 150
     loss: binary_crossentropy
-  #- epochs: 150
-  #  loss: focal_loss
+  - epochs: 50
+    callbacks:
+      CyclicLR:
+        base_lr: 0.000001
+        max_lr: 0.00001
+        mode: triangular2
+        step_size: 30528
