@@ -3,6 +3,7 @@ from musket_core.datasets import PredictionItem
 from PIL import Image
 import pandas as pd
 import os
+import cv2
 
 DIR =                os.getenv('MAIN_DIR', 'D:/cells')
 GLUED_IMAGES =       os.getenv('GLUED_IMAGES', False)
@@ -11,6 +12,12 @@ EXTRA_TRAIN_SUBDIR = os.getenv('EXTRA_TRAIN_SUBDIR', 'train2')
 TRAIN_CSV =          os.getenv('TRAIN_CSV', 'train.csv')
 EXTRA_TRAIN_CSV =    os.getenv('EXTRA_TRAIN_CSV', 'train2.csv')
 TEST_SUBDIR =        os.getenv('TEST_SUBDIR', 'test')
+GLUED_REVERSE_CHANNELS = os.getenv('GLUED_REVERSE_CHANNELS', False)
+
+print("TRAIN_SUBDIR", TRAIN_SUBDIR)
+print("GLUED_IMAGES", GLUED_IMAGES)
+print("GLUED_REVERSE_CHANNELS", GLUED_REVERSE_CHANNELS)
+print("EXTRA_TRAIN_SUBDIR", EXTRA_TRAIN_SUBDIR)
 
 import musket_core.datasets as ds
 class ProteinDataGenerator:
@@ -28,7 +35,10 @@ class ProteinDataGenerator:
 
     def __load_image(self, path):
         if GLUED_IMAGES:
-            im = np.array(Image.open(path + '.png'))
+            if GLUED_REVERSE_CHANNELS:
+                im = np.array(Image.open(path + '.png'))
+            else:
+                im = cv2.imread(path + '.png', -1)
         else:
             R = Image.open(path + '_red.png')
             G = Image.open(path + '_green.png')
